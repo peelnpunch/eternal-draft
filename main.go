@@ -123,6 +123,19 @@ func (m *Mailer) sendEmailWithAttachment(payload *EmailPayload) error {
 	var email bytes.Buffer
 	writer := multipart.NewWriter(&email)
 
+  headers := map[string]string{
+    "From:": m.settings.From,
+    "To:" : payload.to,
+    "Subject:" : payload.subject,
+    "MIME-Version:": "1.0",
+    "Content-Type": "multipart/mixed; boundary=" + writer.Boundary(),
+
+  }
+
+  for k,v := range headers{
+    fmt.Fprintf(&email, "%s: %s\r\n",k,v)
+  }
+
 	// Write the email headers (from, to, subject)
 	fmt.Fprintf(&email, "From: %s\r\n", m.settings.From)
 	fmt.Fprintf(&email, "To: %s\r\n", payload.to)
@@ -141,8 +154,9 @@ func (m *Mailer) sendEmailWithAttachment(payload *EmailPayload) error {
 	part.Write([]byte(payload.body + "\r\n"))
 
 	// Add the attachment as a part
+  _, filename := filepath.Split(payload.attachmentPath)
 	part, err = writer.CreatePart(textproto.MIMEHeader{
-		"Content-Disposition":       []string{fmt.Sprintf("attachment; filename=\"%s\"", payload.attachmentPath)},
+		"Content-Disposition":       []string{fmt.Sprintf("attachment; filename=\"%s\"", filename)},
 		"Content-Type":              []string{"application/octet-stream"},
 		"Content-Transfer-Encoding": []string{"base64"},
 	})
@@ -176,7 +190,7 @@ func main() {
 	// Setup SMTP
 	fmt.Println("[*] Setting up...")
 	settings := SMTPSettings{
-		Host:     os.Getenv("SMPT_HOST"),
+		Host:     os.Getenv("SMTP_HOST"),
 		Port:     587,
 		From:     os.Getenv("MAIL_FROM"),
 		Username: os.Getenv("SMTP_USERNAME"),
