@@ -1,4 +1,4 @@
-# "The Eternal Draft" Email Sender
+# "The Eternal Draft" Message Dispatcher 
 
 🔥🌌 Welcome to the "The Eternal Draft" message dispatcher - a Go application crafted with love by the inhabitants of "The Eternal Draft" at AfrikaBurn. ♾️ 📐🌌🔥
 
